@@ -144,6 +144,8 @@
 
                 //Dibujar los objetos
                 this.draw();
+
+                //Verifica las colisiones
                 this.check_collisions();
 
                 //Movimiento de la pelota en el tablero
