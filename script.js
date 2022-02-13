@@ -16,7 +16,7 @@
     self.Board.prototype = {
         get elements(){
             var elements = this.bars;
-            elements.push(this.ball);
+            //elements.push(this.ball);
             return elements;
         }
     }
@@ -33,15 +33,19 @@
         this.board = board;
         this.board.bars.push(this); //Insertar la barra en el tablero
         this.kind = "rectangle"; //Decimos que es
+        this.speed = 20;
     }
 
     self.Bar.prototype = { //Creamos un JSON
         down: function(){
-
+            this.y += this.speed;
         },
         up: function(){
-
+            this.y -= this.speed;
         } 
+        /*toString: function(){
+            return "x: "
+        }*/
     }
 })();
 
@@ -57,44 +61,68 @@
     }
 
     self.BoardView.prototype = {
-        draw: function(){
+        
+        clean: function(){
+            this.ctx.clearRect(0,0,this.board.width,this.board.height);
+        },
+
+        draw: function(){ //Dibuja las barras del juego
             for (var i = this.board.elements.length - 1; i >= 0; i--) {
                 var el = this.board.elements[i];
-                draw(this.ctx,el); //Dibuja lo que toma del array y el contexto
+                draw(this.ctx,el); 
             };
         }
     }
 
     function draw(ctx,element){
-
-        //Hacemos que el elemento kind tenga un tipo y no sea null
-        if(element !== null && element.hasOwnProperty("kind")){
-            
-            switch(element.kind){
-                case "rectangle":
-                    ctx.fillRect(element.x,element.y,element.width,element.height);
-                    break;
-            }
+        switch(element.kind){
+            case "rectangle":
+                ctx.fillRect(element.x,element.y,element.width,element.height);
+                break;
         }
-
     }
 
 })();
 
-//Se ejecuta la ventana lafuncion main
-window.addEventListener("load",main);
+//Declaramos el tablero
+var board = new Board(800,400);
+var bar = new Bar(20,100,40,100,board);
+var bar2 = new Bar(740,100,40,100,board);
+var canvas = document.getElementById("canvas");
+var boardView = new BoardView(canvas,board);
+
+//Configurar el movimiento de las barras
+document.addEventListener("keydown",function(ev){
+    
+    ev.preventDefault();
+
+    if(ev.keyCode == 38){ //Flecha arriba
+        bar.up();
+    }
+    else if(ev.keyCode == 40){ //Flecha abajo
+        bar.down();
+    }
+    else if(ev.keyCode == 87){ //W
+        bar2.up();
+    }
+    else if(ev.keyCode == 83){ //S
+        bar2.down();
+    }
+});
+
+//Animacion para que se mueva las barras
+window.requestAnimationFrame(controller);
 
 //Funcion main
-function main(){ //Controlador
+function controller(){ //Controlador
 
-    //Declaramos el tablero
-    var board = new Board(800,400);
-    var bar = new Bar(20,100,40,100,board);
-    var bar = new Bar(740,100,40,100,board);
-    var canvas = document.getElementById("canvas");
-    var boardView = new BoardView(canvas,board);
+    //Limpiar los cuadros que quedan atras
+    boardView.clean();
 
     //Dibujar los objetos
     boardView.draw();
+
+    //Animacion para que se mueva las barras
+    window.requestAnimationFrame(controller);
 }
 
